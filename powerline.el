@@ -23,23 +23,58 @@
 
 (require 'cl-lib)
 
-(defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
+;(defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
+;  "Powerline face 1."
+;  :group 'powerline)
+;
+;(defface powerline-active2 '((t (:background "grey40" :inherit mode-line)))
+;  "Powerline face 2."
+;  :group 'powerline)
+;
+;(defface powerline-inactive1
+;  '((t (:background "grey11" :inherit mode-line-inactive)))
+;  "Powerline face 1."
+;  :group 'powerline)
+;
+;(defface powerline-inactive2
+;  '((t (:background "grey20" :inherit mode-line-inactive)))
+;  "Powerline face 2."
+;  :group 'powerline)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TJE: theme inheritance and mode-line face interaction not working properly!
+;;      added explicit powerline-active0 and powerline-inactive0...
+(defface powerline-active0 '((t (:background "#5b8694")))
+  "Powerline face 0."
+  :group 'powerline)
+(defface powerline-active1 '((t (:background "#287a84" :foreground "white")))
   "Powerline face 1."
   :group 'powerline)
-
-(defface powerline-active2 '((t (:background "grey40" :inherit mode-line)))
+(defface powerline-active2 '((t (:background "#156" :foreground "grey75")))
   "Powerline face 2."
   :group 'powerline)
 
+;;(defface powerline-active0 '((t (:background "#7b8694")))
+;;  "Powerline face 0."
+;;  :group 'powerline)
+;;(defface powerline-active1 '((t (:background "#36a" :foreground "white")))
+;;  "Powerline face 1."
+;;  :group 'powerline)
+;;(defface powerline-active2 '((t (:background "#246" :foreground "grey75")))
+;;  "Powerline face 2."
+;;  :group 'powerline)
+
+(defface powerline-inactive0 '((t (:background "#7b8694")))
+  "Powerline face 0."
+  :group 'powerline)
 (defface powerline-inactive1
-  '((t (:background "grey11" :inherit mode-line-inactive)))
+  '((t (:background "#566")))
   "Powerline face 1."
   :group 'powerline)
-
 (defface powerline-inactive2
-  '((t (:background "grey20" :inherit mode-line-inactive)))
+  '((t (:background "#344")))
   "Powerline face 2."
   :group 'powerline)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defcustom powerline-default-separator 'arrow
   "The separator to use for the default theme.
@@ -268,7 +303,7 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-concat (&rest strings)
-  "Concatonate STRINGS and pad sides by spaces."
+  "Concatenate STRINGS and pad sides by spaces."
   (concat
    " "
    (mapconcat 'identity (delq nil strings) " ")
@@ -343,6 +378,15 @@ static char * %s[] = {
                                              (.5 . left-margin))))
               'face face))
 
+;;TJE 2014-09-27
+;;;###autoload
+(defpowerline powerline-rmw
+  (propertize "%*"
+              'help-echo (concat "Buffer is " (if buffer-read-only "read-only" "writable") "\n\ mouse-1: toggle")
+              'local-map (make-mode-line-mouse-map
+                          'mouse-1 (lambda () (interactive)
+                                     (toggle-read-only)
+                                     (redraw-modeline)))))
 ;;;###autoload
 (defpowerline powerline-major-mode
   (propertize (format-mode-line mode-name)
@@ -414,8 +458,16 @@ static char * %s[] = {
                           (force-mode-line-update)))))
 
 ;;;###autoload
+;(defpowerline powerline-buffer-id
+;  (format-mode-line mode-line-buffer-identification))
 (defpowerline powerline-buffer-id
-  (format-mode-line mode-line-buffer-identification))
+  (propertize "%b"
+              'help-echo (concat "Buffer Name" (if buffer-file-name (concat "\nFile: " buffer-file-name))
+                                 ;;(unless (eq buffer-file-name buffer-file-truename)
+                                 ;;  (concat "\n(" buffer-file-truename ")"))
+                                 "\nmouse-1: Buffer menu")
+              'local-map (make-mode-line-mouse-map
+                          'mouse-1 'buffer-menu)))
 
 ;;;###autoload
 (defpowerline powerline-process
